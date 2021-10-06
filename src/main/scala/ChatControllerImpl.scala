@@ -36,7 +36,7 @@ class ChatControllerImpl extends ChatController{
     }
   }
 
-  def init(tcpHost: String, tcpPort: String): Unit = {
+  def start(tcpHost: String, tcpPort: String): Unit = {
     val interfaces = NetworkInterface.getNetworkInterfaces
     val inetAddresses = interfaces.flatMap(interface => interface.getInetAddresses)
     val ip = inetAddresses.find(_.isSiteLocalAddress).map(_.getHostAddress).get

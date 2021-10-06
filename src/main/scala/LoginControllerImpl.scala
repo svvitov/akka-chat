@@ -12,14 +12,14 @@ class LoginControllerImpl extends LoginController {
   override def onLoginButton(event: ActionEvent): Unit = {
     if(nicknameTextField.getText.trim != "" && port.getText.trim != "") {
       loginButton.getScene.getWindow.hide()
-      val controller = getController[ChatControllerImpl]("views/ChatWindow.fxml")
+      val controller = getRootController[ChatControllerImpl]("views/ChatWindow.fxml")
       val stage = new Stage()
 
       val interfaces = NetworkInterface.getNetworkInterfaces
       val inetAddresses = interfaces.flatMap(interface => interface.getInetAddresses)
       val ip = inetAddresses.find(_.isSiteLocalAddress).map(_.getHostAddress).get
       controller._2.login = nicknameTextField.getText.trim
-      controller._2.init(if (host.getText.isEmpty) ip else host.getText, port.getText)
+      controller._2.start(if (host.getText.isEmpty) ip else host.getText, port.getText)
 
 
       stage.setScene(new Scene(controller._1))
@@ -29,12 +29,8 @@ class LoginControllerImpl extends LoginController {
     }
   }
 
-  override def initialize(url: URL, resourceBundle: ResourceBundle): Unit = {
-
-  }
-
-  def getController[T](uri: String): (Parent, T) = {
-    val url = getClass.getClassLoader.getResource(uri)
+  def getRootController[T](path: String): (Parent, T) = {
+    val url = getClass.getClassLoader.getResource(path)
     val loader = new FXMLLoader(url)
     val root = loader.load[Parent]()
     val controller = loader.getController[T]

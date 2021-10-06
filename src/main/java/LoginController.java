@@ -7,7 +7,7 @@ import javafx.scene.control.TextField;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginController {
 
     @FXML
     protected TextField nicknameTextField;
@@ -23,11 +23,6 @@ public class LoginController implements Initializable {
 
     @FXML
     void onLoginButton(ActionEvent event) {
-
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
 
     }
 }
