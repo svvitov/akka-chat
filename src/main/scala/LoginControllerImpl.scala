@@ -3,8 +3,7 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.{Parent, Scene}
 import javafx.stage.Stage
 
-import java.net.{NetworkInterface, URL}
-import java.util.ResourceBundle
+import java.net.NetworkInterface
 import scala.collection.convert.ImplicitConversions.`enumeration AsScalaIterator`
 
 class LoginControllerImpl extends LoginController {

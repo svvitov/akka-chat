@@ -3,12 +3,11 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Subscribe}
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import javafx.application.Platform
 import javafx.event.ActionEvent
 
-import java.net.{NetworkInterface, URL}
-import java.util.ResourceBundle
+import java.net.NetworkInterface
 import scala.collection.convert.ImplicitConversions.`enumeration AsScalaIterator`
 
 class ChatControllerImpl extends ChatController{
