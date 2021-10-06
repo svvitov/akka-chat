@@ -3,11 +3,13 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Subscribe}
+import com.typesafe.config.{Config, ConfigFactory}
 import javafx.application.Platform
 import javafx.event.ActionEvent
 
-import java.net.URL
+import java.net.{NetworkInterface, URL}
 import java.util.ResourceBundle
+import scala.collection.convert.ImplicitConversions.`enumeration AsScalaIterator`
 
 class ChatControllerImpl extends ChatController{
 
@@ -34,18 +36,28 @@ class ChatControllerImpl extends ChatController{
     }
   }
 
-  override def initialize(url: URL, resourceBundle: ResourceBundle): Unit = {
-    this.system = ActorSystem("ClusterSystem")
-    val actor = this.system.actorOf(Props(classOf[User], this))
-    val cluster = Cluster(system)
-    cluster.registerOnMemberUp {
-      this.mediator = DistributedPubSub(system).mediator
-      this.mediator ! Subscribe("chat", actor)
-      messagesField.appendText(s"Вы онлайн как: $login\nЧтобы отправить приватное сообщение используйте команду /private;NicknameПолучателя;Текст сообщения\n\n")
+  def init(tcpHost: String, tcpPort: String): Unit = {
+    val interfaces = NetworkInterface.getNetworkInterfaces
+    val inetAddresses = interfaces.flatMap(interface => interface.getInetAddresses)
+    val ip = inetAddresses.find(_.isSiteLocalAddress).map(_.getHostAddress).get
+
+    if (!tcpPort.equals("")) {
+          val config = ConfigFactory.parseString(s"""
+            akka.remote.artery.canonical.port=$tcpPort
+            akka.remote.artery.canonical.hostname = $ip
+            akka.cluster.seed-nodes = [\"akka://ClusterSystem@$ip:2551", "akka://ClusterSystem@$tcpHost:$tcpPort"]
+            """).withFallback(ConfigFactory.load())
+
+      this.system = ActorSystem("ClusterSystem", config)
+      val actor = this.system.actorOf(Props(classOf[User], this))
+      val cluster = Cluster(system)
+      cluster.registerOnMemberUp {
+        this.mediator = DistributedPubSub(system).mediator
+        this.mediator ! Subscribe("chat", actor)
+        messagesField.appendText(s"Вы онлайн как: $login\nЧтобы отправить приватное сообщение используйте команду /private;NicknameПолучателя;Текст сообщения\n\n")
+      }
     }
-
   }
-
 
 
   override def onExitButton(event: ActionEvent): Unit = {

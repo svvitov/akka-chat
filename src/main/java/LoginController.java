@@ -13,6 +13,12 @@ public class LoginController implements Initializable {
     protected TextField nicknameTextField;
 
     @FXML
+    protected TextField host;
+
+    @FXML
+    protected TextField port;
+
+    @FXML
     protected Button loginButton;
 
     @FXML
