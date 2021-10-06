@@ -5,11 +5,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="920.0" style="-fx-background-color: #708090;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ChatControllerImpl">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="873.0" style="-fx-background-color: #708090;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ChatControllerImpl">
     <children>
-        <TextArea fx:id="messagesField" editable="false" layoutX="65.0" layoutY="6.0" prefHeight="501.0" prefWidth="755.0" />
-        <TextField fx:id="messageInput" layoutX="65.0" layoutY="515.0" prefHeight="28.0" prefWidth="665.0" promptText="Enter your text..." />
-        <Button fx:id="sendMessageButton" defaultButton="true" layoutX="740.0" layoutY="515.0" mnemonicParsing="false" onAction="#onSendMessageButton" prefHeight="28.0" prefWidth="80.0" style="-fx-cursor: hand;" text="Send" />
-        <Button fx:id="exitButton" cancelButton="true" layoutX="834.0" layoutY="516.0" mnemonicParsing="false" onAction="#onExitButton" prefHeight="25.0" prefWidth="80.0" text="Exit" />
+        <TextArea fx:id="messagesField" editable="false" layoutX="65.0" layoutY="6.0" prefHeight="501.0" prefWidth="681.0" />
+        <TextField fx:id="messageInput" layoutX="65.0" layoutY="515.0" prefHeight="28.0" prefWidth="589.0" promptText="Enter your text..." />
+        <Button fx:id="sendMessageButton" defaultButton="true" layoutX="664.0" layoutY="514.0" mnemonicParsing="false" onAction="#onSendMessageButton" prefHeight="28.0" prefWidth="80.0" style="-fx-cursor: hand;" text="Send" />
+        <Button fx:id="exitButton" cancelButton="true" layoutX="758.0" layoutY="516.0" mnemonicParsing="false" onAction="#onExitButton" prefHeight="25.0" prefWidth="104.0" text="Exit" />
     </children>
 </AnchorPane>

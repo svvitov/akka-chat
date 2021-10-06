@@ -1,71 +1,56 @@
-import User.{Bye, PrivateMessage, PublicMessage}
-import akka.actor.{ActorRef, ActorSystem, Address, AddressFromURIString, Props}
+import User.{PrivateMessage, PublicMessage}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.Cluster
-import akka.cluster.ClusterEvent.{InitialStateAsEvents, MemberEvent, UnreachableMember}
-import com.typesafe.config.ConfigFactory
+import akka.cluster.pubsub.DistributedPubSub
+import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Subscribe}
 import javafx.application.Platform
 import javafx.event.ActionEvent
-import javafx.fxml.{FXML, FXMLLoader}
-import javafx.scene.Parent
-import javafx.stage.Stage
 
 import java.net.URL
 import java.util.ResourceBundle
 
-class ChatControllerImpl extends ChatController {
+class ChatControllerImpl extends ChatController{
 
-  var login: String = _
+  var login: String = _ // var, потому что сюда передается login из окна входа
   var system: ActorSystem = _
+  var mediator: ActorRef = _
 
 
-  var usersOnlineRefs: IndexedSeq[ActorRef] = IndexedSeq.empty[ActorRef]
+  override def onSendMessageButton(event: ActionEvent): Unit = {
+    val nickname = login // создаю val на основе var login, чтобы не отправлять var
+    val message = messageInput.getText.trim
+    if (message != "") {
+    message match {
+    //приватное сообщение /private;получатель; текст
+      case input: String if message.contains("/private") =>
+        val command = input.split(";").toVector
+        val to = command(1)
+        val text = command(2)
+        this.mediator ! Publish("chat", PrivateMessage(nickname, to, text))
 
-  @FXML
-  override  def onSendMessageButton(event: ActionEvent): Unit = {
-    val nickname = login //чтобы не отправлять var
-
-    if (!(messageInput.getText == "")) {
-      val yourMessage = messageInput.getText.trim
-      messageInput.clear()
-
-      yourMessage match {
-        // /private; nickname ; text
-        case string: String if yourMessage.contains("/private") =>
-          val s2 = string.split(";").toVector
-          val destination = s2(1)
-          val text = s2(2).mkString
-          usersOnlineRefs.foreach(_ ! PrivateMessage(nickname, destination, text))
-
-        case _ => usersOnlineRefs.foreach(_ ! PublicMessage(nickname, yourMessage))
-
+      case _ => this.mediator ! Publish("chat", PublicMessage(nickname, message))
       }
+    messageInput.clear()
     }
   }
 
-  @FXML
-  override  def onExitButton(event: ActionEvent): Unit = {
-    val nickname = login //чтобы не отправлять var
-    usersOnlineRefs.foreach(_ ! Bye(nickname))
+  override def initialize(url: URL, resourceBundle: ResourceBundle): Unit = {
+    this.system = ActorSystem("ClusterSystem")
+    val actor = this.system.actorOf(Props(classOf[User], this))
+    val cluster = Cluster(system)
+    cluster.registerOnMemberUp {
+      this.mediator = DistributedPubSub(system).mediator
+      this.mediator ! Subscribe("chat", actor)
+      messagesField.appendText(s"Вы онлайн как: $login\nЧтобы отправить приватное сообщение используйте команду /private;NicknameПолучателя;Текст сообщения\n\n")
+    }
+
+  }
+
+
+
+  override def onExitButton(event: ActionEvent): Unit = {
     system.terminate()
     Platform.exit()
     System.exit(0)
   }
-
-  override def initialize(location: URL, resources: ResourceBundle): Unit = {
-    startCluster()
-  }
-
-  def startCluster(): Unit = {
-    val conf = ConfigFactory.load("application.conf")
-    this.system = ActorSystem("ClusterSystem", conf)
-    val actor = system.actorOf(Props(classOf[User], this))
-    val cluster = Cluster(this.system)
-    cluster.registerOnMemberUp {
-      cluster.subscribe(actor, initialStateMode = InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
-      messagesField.appendText(s"Вы онлайн как: $login\n")
-      messagesField.appendText("Чтобы отправить приватное сообщение используйте команду: /private;nickname;text\n\n")
-    }
-  }
-
-
 }

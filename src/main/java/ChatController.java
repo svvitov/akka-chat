@@ -14,9 +14,6 @@ public class ChatController implements Initializable {
     protected TextArea messagesField;
 
     @FXML
-    protected TextArea usersOnline;
-
-    @FXML
     protected TextField messageInput;
 
     @FXML
