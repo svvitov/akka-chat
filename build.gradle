@@ -11,6 +11,10 @@ repositories {
     mavenCentral()
 }
 
+application {
+    mainClass = 'Launcher'
+}
+
 def versions = [
         ScalaBinary: "2.13"
 ]
